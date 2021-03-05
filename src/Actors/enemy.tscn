@@ -1,0 +1,159 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://assets/Characters/Enemies/ghost/sprite-sheet-112x93.png" type="Texture" id=1]
+[ext_resource path="res://src/Actors/enemy.gd" type="Script" id=2]
+
+[sub_resource type="Animation" id=1]
+resource_name = "atack"
+length = 0.5
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 7, 8, 9, 10 ]
+}
+
+[sub_resource type="Animation" id=2]
+resource_name = "hurt"
+length = 0.34
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 26, 27, 28, 29 ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Sprite:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 1 ), Color( 0.847059, 0.160784, 0.160784, 1 ), Color( 1, 1, 1, 1 ) ]
+}
+
+[sub_resource type="Animation" id=3]
+resource_name = "idle"
+length = 0.5
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 1, 2, 3, 4, 5 ]
+}
+
+[sub_resource type="Animation" id=4]
+resource_name = "magic_atack"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray(  ),
+"transitions": PoolRealArray(  ),
+"update": 1,
+"values": [  ]
+}
+
+[sub_resource type="Animation" id=5]
+length = 0.5
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 0, 1, 2, 3, 4 ]
+}
+
+[sub_resource type="RectangleShape2D" id=6]
+extents = Vector2( 25.3295, 53.6317 )
+
+[sub_resource type="RectangleShape2D" id=7]
+extents = Vector2( 19.0526, 30.1173 )
+
+[node name="Enemy" type="KinematicBody2D"]
+position = Vector2( 2.94482, -18.6878 )
+scale = Vector2( 0.3, 0.3 )
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_group_": true
+}
+speed = 50
+hp = 100
+size = Vector2( 0.3, 0.3 )
+
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( 1.11237, -13.1796 )
+texture = ExtResource( 1 )
+vframes = 5
+hframes = 6
+frame = 28
+
+[node name="AnimPlayer" type="AnimationPlayer" parent="."]
+anims/atack = SubResource( 1 )
+anims/hurt = SubResource( 2 )
+anims/idle = SubResource( 3 )
+anims/magic_atack = SubResource( 4 )
+anims/walk = SubResource( 5 )
+
+[node name="Colisao" type="CollisionShape2D" parent="."]
+position = Vector2( -9.97248, 9.40292 )
+shape = SubResource( 6 )
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+position = Vector2( 19.2779, 62.8761 )
+enabled = true
+cast_to = Vector2( 0, 24 )
+
+[node name="Timer" type="Timer" parent="."]
+one_shot = true
+
+[node name="areaAtack" type="Area2D" parent="."]
+position = Vector2( 94.5311, 5.42387 )
+
+[node name="collisionAtack" type="CollisionShape2D" parent="areaAtack"]
+position = Vector2( -59.7629, 9.38616 )
+shape = SubResource( 7 )
+
+[node name="damage" type="Timer" parent="areaAtack"]
+one_shot = true
+
+[node name="finishAtack" type="Timer" parent="areaAtack"]
+wait_time = 0.5
+one_shot = true
+[connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
+[connection signal="body_entered" from="areaAtack" to="." method="_on_areaAtack_body_entered"]
+[connection signal="body_exited" from="areaAtack" to="." method="_on_areaAtack_body_exited"]
+[connection signal="timeout" from="areaAtack/damage" to="." method="_on_damage_timeout"]
+[connection signal="timeout" from="areaAtack/finishAtack" to="." method="_on_finishAtack_timeout"]
